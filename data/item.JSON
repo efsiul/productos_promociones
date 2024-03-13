@@ -1,0 +1,52 @@
+[
+    {
+        "itemCode": "2627601",
+        "name": "ProductoA",
+        "price": 8.90
+    },
+    {
+        "itemCode": "2627602",
+        "name": "ProductoB",
+        "price": 2.00
+    },
+    {
+        "itemCode": "2627603",
+        "name": "ProductoC",
+        "price": 1.40
+    },
+    {
+        "itemCode": "2627604",
+        "name": "ProductoD",
+        "price": 5.10
+    },
+    {
+        "itemCode": "2627605",
+        "name": "ProductoE",
+        "price": 1.00
+    },
+    {
+        "itemCode": "2627606",
+        "name": "ProductoF",
+        "price": 3.20
+    },
+    {
+        "itemCode": "2627607",
+        "name": "ProductoG",
+        "price": 2.10
+    },
+    {
+        "itemCode": "2627608",
+        "name": "ProductoH",
+        "price": 3.50
+    },
+    {
+        "itemCode": "2627609",
+        "name": "ProductoI",
+        "price": 2.15
+    },
+    {
+        "itemCode": "2627610",
+        "name": "ProductoJ",
+        "price": 1.05
+    }
+]
