@@ -26,17 +26,19 @@ Se ejecutara el docker-compose y se construira la base de datos en PostgreSQL
 
 Inicialice el proyecto con el editor de codigo de su preferencia, este ultimo debe permitir correr SpringBoot
 
+---
+
 Abra Postman o cualquier herramienta que permita implementar metods http e ingrese en el metodo 'POST' el siguiente endpoint:
     <http://localhost:8080/promotions/load>
 
 Se cargara la tabla de promociones con el archivo data/promotion.json, donde se encuentran las promociones determinadas.
 
-Puede listar dichos productos a traves del enpoint:
+Puede listar dichos productos a traves del enpoint con metodo GET:
     <http://localhost:8080/promotions>
 
 
-Puede ingresar los diferentes productos, de forma individual en el siguiente endpoint:
-    <http://localhost:8080/items>
+Puede ingresar los diferentes productos, de forma individual en el siguiente endpoint con metodo POST:
+    <http://localhost:8080/items/create>
 
 con las siguientes caracteristicas:
 
@@ -48,3 +50,25 @@ con las siguientes caracteristicas:
     }
 ```
 
+Puede consultar la lista de productos ingresados en el siguiente endpoint con metodo GET:
+    <http://localhost:8080/items/getAll>
+
+para validación promociones puede ingrear al siguiente endpoint con metodo POST:
+    <http://localhost:8080/items/validatePromotions>
+
+la estructura de los datos debe ser la siguiente:
+
+```json
+    [
+        {
+            "itemCode": "2627601",
+            "name": "ProductoA",
+            "price": 8.90
+        },
+        {
+            "itemCode": "2627602",
+            "name": "ProductoB",
+            "price": 12.50
+        }
+    ]
+```

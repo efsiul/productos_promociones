@@ -54,8 +54,7 @@ public class PromotionServiceImpl implements I_PromotionService {
             promotion.setTriggeringItems(
                 promotionDto.getTriggeringItems().stream().map(triggeringItemDto -> {
                     TriggeringItemModels triggeringItem = new TriggeringItemModels();
-                    triggeringItem.setId(Long.valueOf(triggeringItemDto.getId())); // Fix: Convert String to Long
-                    triggeringItem.setItemCode(triggeringItemDto.getItemCode());
+                    triggeringItem.setId(Long.valueOf(triggeringItemDto.getId())); 
                     triggeringItem.setPromotion(promotion);
                     return triggeringItem;
                 }).collect(Collectors.toList())
@@ -74,7 +73,7 @@ private List<PromotionDto> mapModelsToDtos(List<PromotionModels> promotions) {
             // Indique los tipos genéricos aquí:
             promotion.getTriggeringItems().stream().<TriggeringItemDto>map(triggeringItem -> {
                 TriggeringItemDto triggeringItemDto = new TriggeringItemDto();
-                triggeringItemDto.setId(String.valueOf(triggeringItem.getId())); // Fix: Convert Long to String
+                triggeringItemDto.setId(String.valueOf(triggeringItem.getId())); 
                 triggeringItemDto.setItemCode(triggeringItem.getItemCode());
                 return triggeringItemDto;
             }).collect(Collectors.toList())
