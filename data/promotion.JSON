@@ -1,47 +1,42 @@
 [
     {
-    "id": "pd1",
     "description": "Descuento del 15%",
     "percentDiscount": 15,
     "triggeringItem": [
-        {"id": "1001", "itemCode": "2627601"},
-        {"id": "1002", "itemCode": "2627602"}
+        { "itemCode": "2627601"},
+        { "itemCode": "2627602"}
         ]
     },
     {
-    "id": "pd2",
     "description": "Descuento del 25%",
     "percentDiscount": 25,
     "triggeringItem": [
-        {"id": "1003", "itemCode": "2627603"},
-        {"id": "1004", "itemCode": "2627604"}
+        { "itemCode": "2627603"},
+        {"itemCode": "2627604"}
         ]
     },
     {
-    "id": "pd3",
     "description": "Descuento del 10%",
     "percentDiscount": 10,
     "triggeringItem": [
-        {"id": "1005", "itemCode": "2627605"},
-        {"id": "1006", "itemCode": "2627606"}
+        { "itemCode": "2627605"},
+        {"itemCode": "2627606"}
         ]
     },
     {
-    "id": "pd4",
     "description": "Descuento del 30%",
     "percentDiscount": 30,
     "triggeringItem": [
-        {"id": "1007", "itemCode": "2627607"},
-        {"id": "1008", "itemCode": "2627608"}
+        { "itemCode": "2627607"},
+        { "itemCode": "2627608"}
         ]
     },
     {
-    "id": "pd5",
     "description": "Descuento del 20%",
     "percentDiscount": 20,
     "triggeringItem": [
-        {"id": "1009", "itemCode": "2627609"},
-        {"id": "1010", "itemCode": "2627610"}
+        {"itemCode": "2627609"},
+        {"itemCode": "2627610"}
         ]
     }
 ]

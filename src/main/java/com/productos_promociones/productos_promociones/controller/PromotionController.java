@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.productos_promociones.productos_promociones.dto.PromotionDTO;
-import com.productos_promociones.productos_promociones.interfaces.PromotionService;
+import com.productos_promociones.productos_promociones.services.PromotionServiceImpl;
 
 import java.util.List;
 
@@ -13,9 +13,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/promotions")
 public class PromotionController {
-    private final PromotionService promotionService;
 
-    public PromotionController(PromotionService promotionService) {
+    private final PromotionServiceImpl promotionService;
+
+    public PromotionController(PromotionServiceImpl promotionService) {
         this.promotionService = promotionService;
     }
 

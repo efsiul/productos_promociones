@@ -1,9 +1,12 @@
 package com.productos_promociones.productos_promociones.services;
 
+import com.productos_promociones.productos_promociones.repositories.ItemRepository;
 import com.productos_promociones.productos_promociones.repositories.PromotionRepository;
 import com.productos_promociones.productos_promociones.util.PromotionMapper;
+import com.productos_promociones.productos_promociones.dto.ItemDTO;
 import com.productos_promociones.productos_promociones.dto.PromotionDTO;
 import com.productos_promociones.productos_promociones.interfaces.PromotionService;
+import com.productos_promociones.productos_promociones.models.ItemModels;
 import com.productos_promociones.productos_promociones.models.PromotionModels;
 
 import java.util.List;
@@ -15,9 +18,11 @@ import java.util.stream.Collectors;
 @Service
 public class PromotionServiceImpl implements PromotionService {
     private final PromotionRepository promotionRepository;
+    private final ItemRepository itemRepository;
 
-    public PromotionServiceImpl(PromotionRepository promotionRepository) {
+    public PromotionServiceImpl(PromotionRepository promotionRepository, ItemRepository itemRepository) {
         this.promotionRepository = promotionRepository;
+        this.itemRepository = itemRepository;
     }
 
     @Override
@@ -36,6 +41,19 @@ public class PromotionServiceImpl implements PromotionService {
     @Override
     public PromotionDTO createPromotion(PromotionDTO promotionDTO) {
         PromotionModels newPromotion = convertToModel(promotionDTO);
+        
+        // Asociar los productos a la promoción
+        List<ItemModels> triggeringItems = null;
+        if (promotionDTO.getTriggeringItems() != null) {
+            triggeringItems = itemRepository.findAllById(
+                promotionDTO.getTriggeringItems()
+                    .stream()
+                    .map(ItemDTO::getId)
+                    .collect(Collectors.toList())
+            );
+        }
+        newPromotion.setTriggeringItems(triggeringItems);
+        
         newPromotion = promotionRepository.save(newPromotion);
         return convertToDTO(newPromotion);
     }
@@ -47,7 +65,6 @@ public class PromotionServiceImpl implements PromotionService {
             PromotionModels existingPromotion = optionalPromotion.get();
             existingPromotion.setDescription(promotionDTO.getDescription());
             existingPromotion.setPercentDiscount(promotionDTO.getPercentDiscount());
-            // Set triggeringItems accordingly if needed
             existingPromotion = promotionRepository.save(existingPromotion);
             return convertToDTO(existingPromotion);
         } else {
@@ -65,7 +82,6 @@ public class PromotionServiceImpl implements PromotionService {
         promotionDTO.setId(promotion.getId());
         promotionDTO.setDescription(promotion.getDescription());
         promotionDTO.setPercentDiscount(promotion.getPercentDiscount());
-        // Set triggeringItems accordingly if needed
         return promotionDTO;
     }
 
@@ -74,7 +90,6 @@ public class PromotionServiceImpl implements PromotionService {
         promotion.setId(promotionDTO.getId());
         promotion.setDescription(promotionDTO.getDescription());
         promotion.setPercentDiscount(promotionDTO.getPercentDiscount());
-        // Set triggeringItems accordingly if needed
         return promotion;
     }
     

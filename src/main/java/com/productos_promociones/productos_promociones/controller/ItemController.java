@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.productos_promociones.productos_promociones.dto.ItemDTO;
-import com.productos_promociones.productos_promociones.interfaces.ItemService;
+import com.productos_promociones.productos_promociones.services.ItemServiceImpl;
 
 import java.util.List;
 
@@ -20,9 +20,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/items")
 public class ItemController {
-    private final ItemService itemService;
 
-    public ItemController(ItemService itemService) {
+    private final ItemServiceImpl itemService;
+
+    public ItemController(ItemServiceImpl itemService) {
         this.itemService = itemService;
     }
     @GetMapping

@@ -1,8 +1,9 @@
 package com.productos_promociones.productos_promociones.models;
-import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.productos_promociones.productos_promociones.dto.PromotionDTO;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,11 +33,10 @@ public class PromotionModels {
 
     @ManyToMany
     @JoinTable(
-        name = "promotion_items",
+        name = "product_promotion_items",
         joinColumns = @JoinColumn(name = "promotion_id"),
         inverseJoinColumns = @JoinColumn(name = "item_id")
     )
-    private List<ItemModels> triggeringItems;
-
+    private List<ItemModels> triggeringItems = new ArrayList<>();
 
 }

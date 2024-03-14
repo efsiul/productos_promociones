@@ -1,6 +1,5 @@
 package com.productos_promociones.productos_promociones.services;
 
-import org.apache.el.stream.Optional;
 import org.springframework.stereotype.Service;
 
 import com.productos_promociones.productos_promociones.dto.ItemDTO;
