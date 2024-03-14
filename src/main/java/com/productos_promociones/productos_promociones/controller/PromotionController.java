@@ -1,66 +1,29 @@
 package com.productos_promociones.productos_promociones.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import com.productos_promociones.productos_promociones.dto.PromotionDTO;
-import com.productos_promociones.productos_promociones.services.PromotionServiceImpl;
 
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.productos_promociones.productos_promociones.interfaces.I_PromotionService;
+import com.productos_promociones.productos_promociones.dto.PromotionDto; // Add this import statement
 
 
 @RestController
 @RequestMapping("/promotions")
 public class PromotionController {
+    
+    @Autowired
+    private I_PromotionService promotionService;
 
-    private final PromotionServiceImpl promotionService;
-
-    public PromotionController(PromotionServiceImpl promotionService) {
-        this.promotionService = promotionService;
+    @PostMapping("/load")
+    public void loadPromotionsFromJson() throws Exception {
+        promotionService.loadPromotionsFromJson();
     }
 
     @GetMapping
-    public ResponseEntity<List<PromotionDTO>> getAllPromotions() {
-        List<PromotionDTO> promotions = promotionService.getAllPromotions();
-        return new ResponseEntity<>(promotions, HttpStatus.OK);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<PromotionDTO> getPromotionById(@PathVariable Long id) {
-        PromotionDTO promotion = promotionService.getPromotionById(id);
-        if (promotion != null) {
-            return new ResponseEntity<>(promotion, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PostMapping
-    public ResponseEntity<PromotionDTO> createPromotion(@RequestBody PromotionDTO promotionDTO) {
-        PromotionDTO newPromotion = promotionService.createPromotion(promotionDTO);
-        return new ResponseEntity<>(newPromotion, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<PromotionDTO> updatePromotion(@PathVariable Long id, @RequestBody PromotionDTO promotionDTO) {
-        PromotionDTO updatedPromotion = promotionService.updatePromotion(id, promotionDTO);
-        if (updatedPromotion != null) {
-            return new ResponseEntity<>(updatedPromotion, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePromotion(@PathVariable Long id) {
-        promotionService.deletePromotion(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @GetMapping("/best/{itemId}")
-    public ResponseEntity<PromotionDTO> findBestPromotionForItem(@PathVariable String itemId) {
-        PromotionDTO bestPromotion = promotionService.findBestPromotionForItem(itemId);
-        return ResponseEntity.ok(bestPromotion);
+    public List<PromotionDto> getAllPromotions() {
+        return promotionService.getAllPromotions();
     }
 }

@@ -1,103 +1,85 @@
 package com.productos_promociones.productos_promociones.services;
 
-import com.productos_promociones.productos_promociones.repositories.ItemRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.productos_promociones.productos_promociones.repositories.PromotionRepository;
-import com.productos_promociones.productos_promociones.util.PromotionMapper;
-import com.productos_promociones.productos_promociones.dto.ItemDTO;
-import com.productos_promociones.productos_promociones.dto.PromotionDTO;
-import com.productos_promociones.productos_promociones.interfaces.PromotionService;
-import com.productos_promociones.productos_promociones.models.ItemModels;
+
+
+import com.productos_promociones.productos_promociones.dto.PromotionDto;
+import com.productos_promociones.productos_promociones.dto.PromotionDto.TriggeringItemDto;
+import com.productos_promociones.productos_promociones.interfaces.I_PromotionService;
 import com.productos_promociones.productos_promociones.models.PromotionModels;
+import com.productos_promociones.productos_promociones.models.TriggeringItemModels;
 
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+
+
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
-public class PromotionServiceImpl implements PromotionService {
-    private final PromotionRepository promotionRepository;
-    private final ItemRepository itemRepository;
+public class PromotionServiceImpl implements I_PromotionService {
 
-    public PromotionServiceImpl(PromotionRepository promotionRepository, ItemRepository itemRepository) {
-        this.promotionRepository = promotionRepository;
-        this.itemRepository = itemRepository;
+    @Autowired
+    private PromotionRepository promotionRepository;
+
+    @Override
+    public void loadPromotionsFromJson() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        String itemsJson = new String(Files.readAllBytes(Paths.get("data/promotion.json")));
+        PromotionDto[] promotionsDto = mapper.readValue(itemsJson, PromotionDto[].class);
+
+        List<PromotionModels> promotions = mapDtosToModels(promotionsDto);
+        promotionRepository.saveAll(promotions);
     }
 
     @Override
-    public List<PromotionDTO> getAllPromotions() {
-        return promotionRepository.findAll().stream()
-                .map(PromotionMapper::convertToDto)
-                .collect(Collectors.toList());
+    public List<PromotionDto> getAllPromotions() {
+        List<PromotionModels> promotions = promotionRepository.findAll();
+        return mapModelsToDtos(promotions);
     }
 
-    @Override
-    public PromotionDTO getPromotionById(Long id) {
-        java.util.Optional<PromotionModels> optionalPromotion = promotionRepository.findById(id);
-        return optionalPromotion.map(this::convertToDTO).orElse(null);
-    }
-
-    @Override
-    public PromotionDTO createPromotion(PromotionDTO promotionDTO) {
-        PromotionModels newPromotion = convertToModel(promotionDTO);
-        
-        // Asociar los productos a la promoción
-        List<ItemModels> triggeringItems = null;
-        if (promotionDTO.getTriggeringItems() != null) {
-            triggeringItems = itemRepository.findAllById(
-                promotionDTO.getTriggeringItems()
-                    .stream()
-                    .map(ItemDTO::getId)
-                    .collect(Collectors.toList())
+    private List<PromotionModels> mapDtosToModels(PromotionDto[] promotionsDto) {
+        return Arrays.stream(promotionsDto).map(promotionDto -> {
+            PromotionModels promotion = new PromotionModels();
+            promotion.setId(promotionDto.getId());
+            promotion.setDescription(promotionDto.getDescription());
+            promotion.setPercentDiscount(promotionDto.getPercentDiscount());
+            promotion.setTriggeringItems(
+                promotionDto.getTriggeringItems().stream().map(triggeringItemDto -> {
+                    TriggeringItemModels triggeringItem = new TriggeringItemModels();
+                    triggeringItem.setId(Long.valueOf(triggeringItemDto.getId())); // Fix: Convert String to Long
+                    triggeringItem.setItemCode(triggeringItemDto.getItemCode());
+                    triggeringItem.setPromotion(promotion);
+                    return triggeringItem;
+                }).collect(Collectors.toList())
             );
-        }
-        newPromotion.setTriggeringItems(triggeringItems);
-        
-        newPromotion = promotionRepository.save(newPromotion);
-        return convertToDTO(newPromotion);
+            return promotion;
+        }).collect(Collectors.toList());
     }
 
-    @Override
-    public PromotionDTO updatePromotion(Long id, PromotionDTO promotionDTO) {
-        java.util.Optional<PromotionModels> optionalPromotion = promotionRepository.findById(id);
-        if (optionalPromotion.isPresent()) {
-            PromotionModels existingPromotion = optionalPromotion.get();
-            existingPromotion.setDescription(promotionDTO.getDescription());
-            existingPromotion.setPercentDiscount(promotionDTO.getPercentDiscount());
-            existingPromotion = promotionRepository.save(existingPromotion);
-            return convertToDTO(existingPromotion);
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public void deletePromotion(Long id) {
-        promotionRepository.deleteById(id);
-    }
-
-    private PromotionDTO convertToDTO(PromotionModels promotion) {
-        PromotionDTO promotionDTO = new PromotionDTO();
-        promotionDTO.setId(promotion.getId());
-        promotionDTO.setDescription(promotion.getDescription());
-        promotionDTO.setPercentDiscount(promotion.getPercentDiscount());
-        return promotionDTO;
-    }
-
-    private PromotionModels convertToModel(PromotionDTO promotionDTO) {
-        PromotionModels promotion = new PromotionModels();
-        promotion.setId(promotionDTO.getId());
-        promotion.setDescription(promotionDTO.getDescription());
-        promotion.setPercentDiscount(promotionDTO.getPercentDiscount());
-        return promotion;
-    }
-    
-    @Override
-    public PromotionDTO findBestPromotionForItem(String itemId) {
-        // Implementación para encontrar la mejor promoción para un artículo dado y convertirla a DTO
-        // Por ahora, devolvemos una promoción aleatoria solo para fines de demostración
-        return PromotionMapper.convertToDto(promotionRepository.findAll().get(0));
-    }
-
- }
+private List<PromotionDto> mapModelsToDtos(List<PromotionModels> promotions) {
+    return promotions.stream().map(promotion -> {
+        PromotionDto promotionDto = new PromotionDto();
+        promotionDto.setId(promotion.getId());
+        promotionDto.setDescription(promotion.getDescription());
+        promotionDto.setPercentDiscount(promotion.getPercentDiscount());
+        promotionDto.setTriggeringItems(
+            // Indique los tipos genéricos aquí:
+            promotion.getTriggeringItems().stream().<TriggeringItemDto>map(triggeringItem -> {
+                TriggeringItemDto triggeringItemDto = new TriggeringItemDto();
+                triggeringItemDto.setId(String.valueOf(triggeringItem.getId())); // Fix: Convert Long to String
+                triggeringItemDto.setItemCode(triggeringItem.getItemCode());
+                return triggeringItemDto;
+            }).collect(Collectors.toList())
+        );
+        return promotionDto;
+    }).collect(Collectors.toList());
+}
+}

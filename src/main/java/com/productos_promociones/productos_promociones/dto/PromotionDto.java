@@ -6,17 +6,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class PromotionDTO {
-    private Long id;
+public class PromotionDto {
+    private String id;
 
     @JsonProperty("description")
     private String description;
 
     @JsonProperty("percentDiscount")
-    private double percentDiscount;
+    private Double percentDiscount;
 
     @JsonProperty("triggeringItems")
-    private List<ItemDTO> triggeringItems;
+    private List<TriggeringItemDto> triggeringItems;
 
+    @Data
+    public static class TriggeringItemDto {
+        private String id;
+        private String itemCode;
 
+    }
 }

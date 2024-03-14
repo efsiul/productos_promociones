@@ -5,16 +5,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class ItemDTO {
-    private Long id;
+public class ItemDto {
 
     @JsonProperty("itemCode")
     private String itemCode;
 
     @JsonProperty("name")
     private String name;
-    
-    @JsonProperty("price")
-    private double price;
 
+    @JsonProperty("price")
+    private Double price;
+
+    @JsonProperty("priceDiscount")
+    private Double priceDiscount;
 }

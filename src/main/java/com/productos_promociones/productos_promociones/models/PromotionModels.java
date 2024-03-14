@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -22,21 +21,19 @@ import lombok.Data;
 public class PromotionModels {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @Column(name = "description")
     private String description;
 
     @Column(name = "percent_discount")
-    private double percentDiscount;
+    private Double percentDiscount;
 
-    @ManyToMany
-    @JoinTable(
-        name = "product_promotion_items",
-        joinColumns = @JoinColumn(name = "promotion_id"),
-        inverseJoinColumns = @JoinColumn(name = "item_id")
-    )
-    private List<ItemModels> triggeringItems = new ArrayList<>();
+    @OneToMany(mappedBy = "promotion", cascade = CascadeType.ALL) 
+    private List<TriggeringItemModels> triggeringItems = new ArrayList<>();
 
+    public void addTriggeringItem(TriggeringItemModels item) {
+        item.setPromotion(this);
+        triggeringItems.add(item);
+    }
 }

@@ -1,57 +1,52 @@
 package com.productos_promociones.productos_promociones.services;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.productos_promociones.productos_promociones.dto.ItemDTO;
-import com.productos_promociones.productos_promociones.interfaces.ItemService;
+import com.productos_promociones.productos_promociones.dto.ItemDto;
+import com.productos_promociones.productos_promociones.interfaces.I_ItemService;
 import com.productos_promociones.productos_promociones.models.ItemModels;
+import com.productos_promociones.productos_promociones.models.PromotionModels;
 import com.productos_promociones.productos_promociones.repositories.ItemRepository;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.productos_promociones.productos_promociones.repositories.PromotionRepository;
 
 
 @Service
-public class ItemServiceImpl implements ItemService {
+public class ItemServiceImpl implements I_ItemService{
 
-    private final ItemRepository itemRepository;
+    
+    @Autowired
+    private ItemRepository itemRepository;
 
-    public ItemServiceImpl(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
-    }
+    @Autowired
+    private PromotionRepository promotionRepository;
 
-    @Override
-    public List<ItemDTO> getAllItems() {
-        return itemRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
+    // Mapa para almacenar las promociones encontradas
+    private Map<String, PromotionModels> promotionMap = new HashMap<>();
 
     @Override
-    public ItemDTO getItemById(Long id) {
-        java.util.Optional<ItemModels> optionalItem = itemRepository.findById(id);
-        return optionalItem.map(this::convertToDTO).orElse(null);
-    }
-
-    @Override
-    public ItemDTO createItem(ItemDTO itemDTO) {
-        ItemModels newItem = convertToModel(itemDTO);
-        newItem = itemRepository.save(newItem);
-        return convertToDTO(newItem);
-    }
-
-    @Override
-    public ItemDTO updateItem(Long id, ItemDTO itemDTO) {
-        java.util.Optional<ItemModels> optionalItem = itemRepository.findById(id);
-        if (optionalItem.isPresent()) {
-            ItemModels existingItem = optionalItem.get();
-            existingItem.setItemCode(itemDTO.getItemCode());
-            existingItem.setName(itemDTO.getName());
-            existingItem.setPrice(itemDTO.getPrice());
-            existingItem = itemRepository.save(existingItem);
-            return convertToDTO(existingItem);
-        } else {
-            return null;
+    public ItemDto createItem(ItemDto itemDto) throws Exception {
+        // Buscar el descuento en promotions
+        PromotionModels promotion = getPromotionByItemCode(itemDto.getItemCode());
+        if (promotion != null) {
+            Double discount = promotion.getPercentDiscount();
+            itemDto.setPriceDiscount(itemDto.getPrice() * (1 - discount / 100));
         }
+
+        ItemModels newItem = new ItemModels();
+        newItem.setItemCode(itemDto.getItemCode());
+        newItem.setName(itemDto.getName());
+        newItem.setPrice(itemDto.getPrice());
+        newItem.setPriceDiscount(itemDto.getPriceDiscount());
+
+        ItemModels savedItem = itemRepository.save(newItem);
+        return convertToDto(savedItem);
     }
 
     @Override
@@ -59,21 +54,50 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.deleteById(id);
     }
 
-    private ItemDTO convertToDTO(ItemModels item) {
-        ItemDTO itemDTO = new ItemDTO();
-        itemDTO.setId(item.getId());
-        itemDTO.setItemCode(item.getItemCode());
-        itemDTO.setName(item.getName());
-        itemDTO.setPrice(item.getPrice());
-        return itemDTO;
+    @Override
+    public List<ItemDto> getAllItems() {
+        List<ItemModels> items = itemRepository.findAll();
+        return items.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
-    private ItemModels convertToModel(ItemDTO itemDTO) {
-        ItemModels item = new ItemModels();
-        item.setId(itemDTO.getId());
-        item.setItemCode(itemDTO.getItemCode());
-        item.setName(itemDTO.getName());
-        item.setPrice(itemDTO.getPrice());
-        return item;
+    @Override
+    public ItemDto getItemById(Long id) {
+        Optional<ItemModels> optionalItem = itemRepository.findById(id);
+        return optionalItem.map(this::convertToDto).orElse(null);
+    }
+
+    // Método para obtener la promoción por código de ítem
+    private PromotionModels getPromotionByItemCode(String itemCode) {
+        if (promotionMap.containsKey(itemCode)) {
+            return promotionMap.get(itemCode);
+        } else {
+            PromotionModels promotion = promotionRepository.findByTriggeringItemsItemCode(itemCode);
+            if (promotion != null) {
+                promotionMap.put(itemCode, promotion);
+            }
+            return promotion;
+        }
+    }
+
+    // Método para convertir de Entity a DTO
+    private ItemDto convertToDto(ItemModels item) {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setItemCode(item.getItemCode());
+        itemDto.setName(item.getName());
+        itemDto.setPrice(item.getPrice());
+        itemDto.setPriceDiscount(item.getPriceDiscount());
+        return itemDto;
+    }
+
+    // Método para realizar la validación de promociones
+    public List<ItemDto> promotionsValidation(List<ItemDto> items) {
+        for (ItemDto item : items) {
+            PromotionModels promotion = getPromotionByItemCode(item.getItemCode());
+            if (promotion != null) {
+                Double discount = promotion.getPercentDiscount();
+                item.setPriceDiscount(item.getPrice() * (1 - discount / 100));
+            }
+        }
+        return items;
     }
 }
