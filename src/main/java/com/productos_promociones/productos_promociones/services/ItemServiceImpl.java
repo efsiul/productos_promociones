@@ -1,5 +1,6 @@
 package com.productos_promociones.productos_promociones.services;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,7 @@ public class ItemServiceImpl implements I_ItemService{
     }
 
     // Método para obtener la promoción por código de ítem
-    private PromotionModels getPromotionByItemCode(String itemCode) {
+    private PromotionModels getPromotionByItemCode1(String itemCode) {
         if (promotionMap.containsKey(itemCode)) {
             return promotionMap.get(itemCode);
         } else {
@@ -78,6 +79,22 @@ public class ItemServiceImpl implements I_ItemService{
             return promotion;
         }
     }
+
+    // Encontrar la promoción con el percentDiscount más alto, si hay varias promociones para el mismo ítem
+    private PromotionModels getPromotionByItemCode(String itemCode) {
+        List<PromotionModels> promotions = promotionRepository.findAllByTriggeringItemsItemCode(itemCode);
+        
+        if (!promotions.isEmpty()) {
+            PromotionModels highestDiscountPromotion = promotions.stream()
+                .max(Comparator.comparingDouble(PromotionModels::getPercentDiscount))
+                .orElse(null);
+            
+            return highestDiscountPromotion;
+        } else {
+            return null;
+        }
+    }
+
 
     // Método para convertir de Entity a DTO
     private ItemDto convertToDto(ItemModels item) {

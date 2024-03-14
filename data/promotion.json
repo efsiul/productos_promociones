@@ -43,5 +43,23 @@
         {"id": "1009", "itemCode": "2627609"},
         {"id": "1010", "itemCode": "2627610"}
         ]
+    }, 
+    {
+        "id": "pd6",
+        "description": "Descuento del 25%",
+        "percentDiscount": 25,
+        "triggeringItems": [
+        {"id": "1011", "itemCode": "2627605"},
+        {"id": "1012", "itemCode": "2627602"}
+        ]
+    },
+    {
+        "id": "pd7",
+        "description": "Descuento del 25%",
+        "percentDiscount": 25,
+        "triggeringItems": [
+            {"id": "1013", "itemCode": "2627608"},
+            {"id": "1014", "itemCode": "2627602"}
+        ]
     }
 ]

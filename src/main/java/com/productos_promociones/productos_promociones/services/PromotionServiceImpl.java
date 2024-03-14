@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 
 
 
-import java.io.File;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -54,7 +52,7 @@ public class PromotionServiceImpl implements I_PromotionService {
             promotion.setTriggeringItems(
                 promotionDto.getTriggeringItems().stream().map(triggeringItemDto -> {
                     TriggeringItemModels triggeringItem = new TriggeringItemModels();
-                    triggeringItem.setId(Long.valueOf(triggeringItemDto.getId())); 
+                    triggeringItem.setItemCode(triggeringItemDto.getItemCode());
                     triggeringItem.setPromotion(promotion);
                     return triggeringItem;
                 }).collect(Collectors.toList())
@@ -70,7 +68,6 @@ private List<PromotionDto> mapModelsToDtos(List<PromotionModels> promotions) {
         promotionDto.setDescription(promotion.getDescription());
         promotionDto.setPercentDiscount(promotion.getPercentDiscount());
         promotionDto.setTriggeringItems(
-            // Indique los tipos genéricos aquí:
             promotion.getTriggeringItems().stream().<TriggeringItemDto>map(triggeringItem -> {
                 TriggeringItemDto triggeringItemDto = new TriggeringItemDto();
                 triggeringItemDto.setId(String.valueOf(triggeringItem.getId())); 
